@@ -14,29 +14,17 @@ class consul_template::config (
   $consul_reload_signal  = $::consul_template::consul_reload_signal,
 ) {
 
-  if versioncmp( $::consul_template::version, '0.18.0') >= 0 {
-
-    concat::fragment { 'header':
-      target  => 'consul-template/config.json',
-      content => inline_template("consul {\n  address = \"<%= @consul_host %>:<%= @consul_port %>\"\n  token = \"<%= @consul_token %>\"\n  retry {\n    attempts = <%= @consul_retry_attempts %>\n    backoff = \"<%= @consul_retry_backoff %>\"\n  }\n}\n\n"),
-      order   => '00',
-    }
-
-  }
-
-  else {
-    concat::fragment { 'header':
-      target  => 'consul-template/config.json',
-      content => inline_template("consul = \"<%= @consul_host %>:<%= @consul_port %>\"\ntoken = \"<%= @consul_token %>\"\nretry = \"<%= @consul_retry %>\"\n\n"),
-      order   => '00',
-    }
+  concat::fragment { 'header':
+    target  => 'consul-template/config.json',
+    content => inline_template("consul {\n  address = \"<%= @consul_host %>:<%= @consul_port %>\"\n  token = \"<%= @consul_token %>\"\n  retry {\n    attempts = <%= @consul_retry_attempts %>\n    backoff = \"<%= @consul_retry_backoff %>\"\n  }\n}\n\n"),
+    order   => '00',
   }
 
   # Set the log level
   concat::fragment { 'log_level':
     target  => 'consul-template/config.json',
     content => inline_template("log_level = \"${::consul_template::log_level}\"\n"),
-    order   => '01'
+    order   => '01',
   }
 
   # Set wait param if specified

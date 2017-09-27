@@ -4,13 +4,13 @@
 # This is a single instance of a configuration file to watch
 # for changes in Consul and update the local file
 define consul_template::watch (
-  $command,
   $destination,
+  $command       = undef,
   $content       = undef,
   $source        = undef,
   $template      = undef,
   $template_vars = {},
-  $perms = '0644',
+  $perms         = '0644',
 ) {
   include ::consul_template
 
@@ -50,8 +50,8 @@ define consul_template::watch (
 
   concat::fragment { $frag_name:
     target  => 'consul-template/config.json',
-    content => "template {\n  source = \"${source_name}\"\n  destination = \"${destination}\"\n  command = \"${command}\"\n  perms = ${perms}\n}\n\n",
+    content => template('consul_template/consul-template-watch.erb'),
     order   => '10',
-    notify  => Service['consul-template']
+    notify  => Service['consul-template'],
   }
 }
